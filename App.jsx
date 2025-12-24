@@ -43,6 +43,14 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const link = document.querySelector('link[rel="icon"]') || document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/x-icon';
+    link.href = '/logotodo.ico';
+    document.head.appendChild(link);
+  }, []);
+
   const filteredTodos = todos
     .filter(t => (filter === "active" ? !t.completed : filter === "completed" ? t.completed : true))
     .filter(t => t.text.toLowerCase().includes(searchTerm.toLowerCase()));
