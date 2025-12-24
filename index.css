@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
 @import "tailwindcss";
 
 * {
@@ -8,12 +7,12 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Poppins', sans-serif;
-  @apply bg-gradient-to-br from-purple-600 to-blue-500 min-h-screen;
+@layer base {
+  body {
+    @apply min-h-screen font-sans bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-white;
+  }
 }
 
-/* Custom Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }

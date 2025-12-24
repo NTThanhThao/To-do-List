@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react';
-import { FiSearch, FiSun, FiMoon } from 'react-icons/fi';
+import { FiSearch } from 'react-icons/fi';
 import TodoForm from './src/components/TodoForm';
 import TodoList from './src/components/TodoList';
 
-function App() {
-  // Theme: persist and apply 'dark' class
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+export default function App() {
+  const [isDark, setIsDark] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
+
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'dark') root.classList.add('dark');
-    else root.classList.remove('dark');
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-  const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
+    const html = window.document.documentElement;
+    if (isDark) {
+      html.classList.add('dark');
+      localStorage.setItem("theme", "dark");
+    } else {
+      html.classList.remove('dark');
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDark]);
 
   const [todos, setTodos] = useState(() => {
     try {
@@ -25,82 +30,62 @@ function App() {
   });
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState("");
+  const [vnTime, setVnTime] = useState('');
 
   useEffect(() => {
     localStorage.setItem("my-tasks-db", JSON.stringify(todos));
   }, [todos]);
 
-  const addTodo = (text) => {
-    setTodos([{ id: Date.now(), text, completed: false }, ...todos]);
-  };
-
-  const toggleTodo = (id) => {
-    setTodos(todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
-  };
-
-  const deleteTodo = (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa công việc này không?")) {
-      setTodos(todos.filter((t) => t.id !== id));
-    }
-  };
+  useEffect(() => {
+    const update = () => setVnTime(new Date().toLocaleTimeString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', hour12: false }));
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const filteredTodos = todos
-    .filter((t) => {
-      if (filter === "active") return !t.completed;
-      if (filter === "completed") return t.completed;
-      return true;
-    })
-    .filter((t) =>
-      t.text.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    .filter(t => (filter === "active" ? !t.completed : filter === "completed" ? t.completed : true))
+    .filter(t => t.text.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
-    <div className="min-h-screen transition-colors duration-300 flex justify-center py-10 px-4 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-slate-900 dark:to-slate-800">
-      <div className="w-full max-w-3xl bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl p-6 md:p-10 transition-all duration-300">
-        {/* Header with theme toggle */}
+    <div className="min-h-screen w-full transition-colors duration-500 flex justify-center py-10 px-4 bg-zinc-50 dark:bg-slate-950 font-sans text-zinc-900 dark:text-white">
+      <div className="w-full max-w-4xl">
         <div className="flex justify-between items-center mb-10">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-              Task Master
+            <h1 className="text-4xl font-black text-indigo-600 dark:text-white tracking-tighter">
+              TASK MASTER <span className="font-light opacity-50">PRO</span>
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium">
-              Manage your day efficiently
-            </p>
+            <p className="text-zinc-500 dark:text-zinc-400 mt-1 font-medium">Professional Portfolio</p>
           </div>
-          <button
-            onClick={toggleTheme}
-            className="p-3 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-yellow-400 hover:scale-110 transition-transform shadow-sm"
-          >
-            {theme === 'light' ? <FiMoon size={24} /> : <FiSun size={24} />}
-          </button>
+
+          <div className="px-4 py-2 rounded-2xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-lg text-sm font-semibold">
+            {vnTime || '--:--:--'} <span className="text-xs text-zinc-500 dark:text-zinc-400">GMT+7</span>
+          </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative mb-8 group">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <FiSearch className="text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
+        <div className="bg-indigo-600 dark:bg-slate-900 rounded-[2.5rem] shadow-2xl p-8 md:p-12 border border-indigo-500 dark:border-slate-800 transition-all duration-500 text-white dark:text-white">
+          <div className="relative mb-10 group">
+            <FiSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-white/60 dark:text-slate-400 group-focus-within:text-white dark:group-focus-within:text-indigo-400" size={22} />
+            <input
+              type="text"
+              placeholder="Tìm kiếm công việc nhanh..."
+              className="w-full pl-6 pr-6 py-4 bg-white/10 dark:bg-slate-800 border-2 border-transparent focus:border-white/30 dark:focus:border-indigo-500 rounded-2xl outline-none placeholder-white/40 dark:placeholder-slate-400 text-white dark:text-white transition-all font-medium"
+              style={{ textIndent: '70px' }}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-          <input
-            type="text"
-            placeholder="Tìm kiếm nhanh công việc..."
-            className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900/50 border-2 border-slate-100 dark:border-slate-700 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-slate-700 dark:text-slate-200 placeholder-slate-400 font-medium"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+
+          <TodoForm onAdd={(text) => setTodos([{ id: Date.now(), text, completed: false }, ...todos])} />
+          <TodoList
+            todos={filteredTodos}
+            onToggle={(id) => setTodos(todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t))}
+            onDelete={(id) => setTodos(todos.filter(t => t.id !== id))}
+            filter={filter}
+            setFilter={setFilter}
           />
         </div>
-
-        <TodoForm onAdd={addTodo} />
-
-        <TodoList
-          todos={filteredTodos}
-          onToggle={toggleTodo}
-          onDelete={deleteTodo}
-          filter={filter}
-          setFilter={setFilter}
-        />
       </div>
     </div>
   );
 }
-
-export default App;

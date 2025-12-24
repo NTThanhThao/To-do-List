@@ -9,7 +9,6 @@ export default function TodoList({ todos, onToggle, onDelete, filter, setFilter 
 
   return (
     <div>
-      {/* Bộ lọc */}
       <div className="flex p-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl mb-6">
         {filters.map((f) => (
           <button
@@ -26,7 +25,6 @@ export default function TodoList({ todos, onToggle, onDelete, filter, setFilter 
         ))}
       </div>
 
-      {/* Danh sách */}
       <div className="space-y-3">
         {todos.length === 0 ? (
           <div className="text-center py-12">

@@ -1,9 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from '../App.jsx'
-import '../index.css' // Đảm bảo file này tồn tại
+import '../index.css' 
 
-// Kiểm tra xem thẻ root có thực sự tồn tại không trước khi render
 const rootElement = document.getElementById('root');
 
 if (rootElement) {
